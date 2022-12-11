@@ -10,9 +10,6 @@ const Settings = () => {
         <>
             <Navbar />
             <h1>Settings</h1>
-            <Button onClick={() => history('/')}>home</Button>
-
-            
         </>
     );
 }
