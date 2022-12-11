@@ -37,7 +37,7 @@ function App() {
     <Authenticator>
       <Router>
         <Routes>
-          <Route path="/home" element={<Home />} />
+          <Route path="/" element={<Home />} />
           <Route path="/settings" element={<Settings />} />
         </Routes>
       </Router>
