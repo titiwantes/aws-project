@@ -1,10 +1,7 @@
 import React from 'react';
 import Navbar from '../components/Navbar';
-import {useNavigate} from 'react-router-dom';
-import { Button } from '@mui/material';
 
 const Settings = () => {
-    const history = useNavigate();
     
     return (
         <>
