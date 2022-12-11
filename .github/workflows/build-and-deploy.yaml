@@ -11,7 +11,7 @@ jobs:
       BUCKET: tek5-aws-project
       DIST: build
       REGION: eu-west-3
-      DIST_ID: E2BEUEZGCETRPO
+      DIST_ID: E2U8FI46Q5IMB6
 
     steps:
     - name: Checkout
