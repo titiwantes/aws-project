@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { styled, alpha } from "@mui/material/styles";
 import IconButton from "@mui/material/IconButton";
 import InputBase from "@mui/material/InputBase";
@@ -20,6 +20,7 @@ import LogoutIcon from "@mui/icons-material/Logout";
 
 import {Auth} from "aws-amplify";
 import { useNavigate } from "react-router-dom";
+import { HomeContext } from "../pages/Home";
 
 const DrawerHeader = styled("div")(({ theme }) => ({
   display: "flex",
@@ -70,6 +71,8 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 }));
 
 const Navbar = () => {
+  const {articlesList, setArticlesList, ARTICLES} = useContext(HomeContext);
+
   const history = useNavigate();
   const handleNavigate = (path) => {
     history(path);
@@ -139,6 +142,13 @@ const Navbar = () => {
         <StyledInputBase
           placeholder="Search…"
           inputProps={{ "aria-label": "search" }}
+          onChange={(e) => {
+            const article = ARTICLES.filter((article) => {
+              return article.tags.some((tag) => tag.toLowerCase().startsWith(e.target.value.toLowerCase()))
+            });
+            console.log(article);
+            setArticlesList(article);
+          }}
         />
       </Search>
     </div>
