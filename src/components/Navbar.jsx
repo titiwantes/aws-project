@@ -1,156 +1,91 @@
 import { useContext, useState } from "react";
-import { styled, alpha } from "@mui/material/styles";
-import IconButton from "@mui/material/IconButton";
-import InputBase from "@mui/material/InputBase";
-import MenuIcon from "@mui/icons-material/Menu";
-import SearchIcon from "@mui/icons-material/Search";
-import { Drawer } from "@mui/material";
-import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
-import Divider from "@mui/material/Divider";
-
-import List from "@mui/material/List";
-import ListItem from "@mui/material/ListItem";
-import ListItemIcon from "@mui/material/ListItemIcon";
-import ListItemText from "@mui/material/ListItemText";
-import ListItemButton from "@mui/material/ListItemButton";
-
-import SettingsIcon from "@mui/icons-material/Settings";
-import HomeIcon from "@mui/icons-material/Home";
-import LogoutIcon from "@mui/icons-material/Logout";
-
-import {Auth} from "aws-amplify";
-import { useNavigate } from "react-router-dom";
 import { HomeContext } from "../pages/Home";
 
-const DrawerHeader = styled("div")(({ theme }) => ({
-  display: "flex",
-  alignItems: "center",
-  padding: theme.spacing(0, 1),
-  // necessary for content to be below app bar
-  ...theme.mixins.toolbar,
-  justifyContent: "flex -end",
-}));
-
-const Search = styled("div")(({ theme }) => ({
-  position: "relative",
-  borderRadius: theme.shape.borderRadius,
-  backgroundColor: alpha(theme.palette.common.white, 0.15),
-  marginLeft: 0,
-  width: "100%",
-  [theme.breakpoints.up("sm")]: {
-    marginLeft: theme.spacing(1),
-    width: "auto",
-  },
-}));
-
-const SearchIconWrapper = styled("div")(({ theme }) => ({
-  padding: theme.spacing(0, 2),
-  height: "100%",
-  position: "absolute",
-  pointerEvents: "none",
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-}));
-
-const StyledInputBase = styled(InputBase)(({ theme }) => ({
-  color: "inherit",
-  "& .MuiInputBase-input": {
-    padding: theme.spacing(1, 1, 1, 0),
-    // vertical padding + font size from searchIcon
-    paddingLeft: `calc(1em + ${theme.spacing(4)})`,
-    transition: theme.transitions.create("width"),
-    width: "100%",
-    [theme.breakpoints.up("sm")]: {
-      width: "12ch",
-      "&:focus": {
-        width: "20ch",
-      },
-    },
-  },
-}));
-
 const Navbar = () => {
-  const {articlesList, setArticlesList, ARTICLES} = useContext(HomeContext);
+  const { setArticlesList, ARTICLES } = useContext(HomeContext);
+  const [select, setSelect] = useState("Chercher par titre");
 
-  const history = useNavigate();
-  const handleNavigate = (path) => {
-    history(path);
-    setOpen(false);
+  const handleSelect = (e) => {
+    setSelect(select === "Chercher par titre" ? "Chercher par tag" : "Chercher par titre");
   };
-  const [open, setOpen] = useState(false);
+
+
+  const handleSearch = (e) => {
+    const searchValue = e.target.value.split(" ");
+    //filter articles by tag list of tags searched
+    
+    const filteredArticles = select.includes("tag") ? ARTICLES.filter((article) => {
+      return searchValue.every((tag) => {
+        return article.tags.some((articleTag) => {
+          return articleTag.includes(tag);
+        });
+      });
+    }) : ARTICLES.filter((article) => {
+      return searchValue.every((word) => {
+        return article.title.includes(word);
+      });
+    });
+
+
+
+    setArticlesList(filteredArticles);
+  };
+
   return (
-    <div className="navbar">
-      <IconButton
-        size="large"
-        edge="start"
-        color="inherit"
-        aria-label="open drawer"
-        sx={{ mr: 2 }}
-        onClick={() => {
-          setOpen(true);
-        }}
-      >
-        <MenuIcon />
-      </IconButton>
-      <Drawer
-        anchor="left"
-        open={open}
-        onClose={() => {
-          setOpen(false);
-        }}
-        ModalProps={{
-          keepMounted: true, // Better open performance on mobile.
-        }}
-        sx={{
-          width: "13vw",
+    <div className="navbar bg-primary  z-50 mb-5 ">
+      <div className="navbar-start">
+        <div className="dropdown">
+          <label tabIndex={0} className="btn btn-ghost btn-circle">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-5 w-5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="white"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M4 6h16M4 12h16M4 18h7"
+              />
+            </svg>
+          </label>
+          <ul
+            tabIndex={0}
+            className="menu menu-compact dropdown-content mt-3 p-2 shadow bg-base-100 rounded-box w-52"
+          >
+            <li>
+              <a>Homepage</a>
+            </li>
+            <li></li>
+            <li>
+              <a>Disconnect</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+      <div className="navbar-center">
+        <div className="btn btn-ghost normal-case text-white text-xl">
+          AWS-Project
+        </div>
+      </div>
 
-          flexShrink: 0,
-          "& .MuiDrawer-paper": {
-            width: "13vw",
-            boxSizing: "border-box",
-            backgroundColor: "rgb(227, 224, 255)",
-          },
-        }}
-      >
-        <DrawerHeader>
-          <IconButton onClick={() => setOpen(false)}>
-            <ChevronLeftIcon />
-          </IconButton>
-        </DrawerHeader>
-        <Divider />
-        <List>
-          {[
-            { link: () => {handleNavigate("/")}, icon: <HomeIcon />, name: "Home" },
-            { link: () => {handleNavigate("/settings")}, icon: <SettingsIcon />, name: "Setting" },
-            { link: () => {Auth.signOut()}, icon: <LogoutIcon />, name: "Logout" },
-          ].map((item, index) => (
-            <ListItem disablePadding>
-              <ListItemButton onClick={item.link}>
-                <ListItemIcon>{item.icon}</ListItemIcon>
-                <ListItemText  primary={item.name} />
-              </ListItemButton>
-            </ListItem>
-          ))}
-        </List>
-      </Drawer>
-
-      <Search>
-        <SearchIconWrapper>
-          <SearchIcon />
-        </SearchIconWrapper>
-        <StyledInputBase
-          placeholder="Search…"
-          inputProps={{ "aria-label": "search" }}
-          onChange={(e) => {
-            const article = ARTICLES.filter((article) => {
-              return article.tags.some((tag) => tag.toLowerCase().startsWith(e.target.value.toLowerCase()))
-            });
-            console.log(article);
-            setArticlesList(article);
-          }}
-        />
-      </Search>
+      <div className="navbar-end">
+        <btn className="btn btn-primary mr-2 text-white " onClick={
+          handleSelect
+        } >
+          {select}
+        </btn>
+        <div className="form-control">
+          <input
+            type="text"
+            placeholder="Search"
+            className="input input-bordered"
+            onChange={(e) => handleSearch(e)}
+          />
+        </div>
+      </div>
     </div>
   );
 };
