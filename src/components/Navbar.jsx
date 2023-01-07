@@ -56,11 +56,11 @@ const Navbar = () => {
             className="menu menu-compact dropdown-content mt-3 p-2 shadow bg-base-100 rounded-box w-52"
           >
             <li>
-              <a>Homepage</a>
+              <label>Homepage</label>
             </li>
             <li></li>
             <li>
-              <a>Disconnect</a>
+              <label>Disconnect</label>
             </li>
           </ul>
         </div>
