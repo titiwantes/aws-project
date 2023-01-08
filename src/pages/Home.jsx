@@ -6,7 +6,7 @@ import { Card, ArticleList } from "../components/Articles";
 
 export const HomeContext = createContext();
 
-const Home = () => {
+const Home = ({signOut, user}) => {
   const ARTICLES = [
     {
       id: 1,
@@ -103,7 +103,7 @@ const Home = () => {
     <HomeContext.Provider
       value={{ articlesList, setArticlesList, ARTICLES, displayedArticles }}
     >
-      <Navbar />
+      <Navbar signOut={signOut} />
       <div>
         <ActionBar />
         <div className="divider">

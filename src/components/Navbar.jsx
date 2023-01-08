@@ -1,7 +1,7 @@
 import { useContext, useState } from "react";
 import { HomeContext } from "../pages/Home";
 
-const Navbar = () => {
+const Navbar = ({signOut}) => {
   const { setArticlesList, ARTICLES } = useContext(HomeContext);
   const [select, setSelect] = useState("Chercher par titre");
 
@@ -60,7 +60,11 @@ const Navbar = () => {
             </li>
             <li></li>
             <li>
-              <label>Disconnect</label>
+              <label
+                onClick={() => {
+                  signOut();
+                }}
+              >Disconnect</label>
             </li>
           </ul>
         </div>

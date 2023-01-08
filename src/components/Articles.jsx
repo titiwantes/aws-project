@@ -1,6 +1,7 @@
 import React, { useContext, useState } from "react";
 import { HomeContext } from "../pages/Home";
 import Modal from "@mui/material/Modal";
+import { toast } from "react-hot-toast";
 
 export const Card = ({ article }) => {
   const { articlesList, setArticlesList } = useContext(HomeContext);
@@ -11,6 +12,7 @@ export const Card = ({ article }) => {
     tags: article.tags,
   });
   const [open, setOpen] = useState(false);
+  const [display, setDisplay] = useState(false);
 
   const handleDelete = (e) => {
     e.preventDefault();
@@ -23,14 +25,14 @@ export const Card = ({ article }) => {
   };
 
   const handleEdit = (e) => {
-    setOpen(false);
-
+    console.log(newArticle);
     if (
       newArticle.title !== "" &&
       newArticle.content !== "" &&
       newArticle.id !== "" &&
       newArticle.tags !== ""
     ) {
+      setOpen(false);
       const nextArticle = {
         id: newArticle.id,
         title: newArticle.title,
@@ -44,7 +46,7 @@ export const Card = ({ article }) => {
       setArticlesList([...filteredArticles, nextArticle]);
       //edit article
     } else {
-      alert("Veuillez remplir tous les champs");
+      toast.error("Veuillez remplir tous les champs");
     }
   };
 
@@ -66,12 +68,16 @@ export const Card = ({ article }) => {
           }}
         >
           <div className="modal-box">
-            <h1 className="font-extrabold text-xl">Modifier un article</h1>
+            <h1 className="font-extrabold mb-8 text-xl">Modifier un article</h1>
+
+            <span className="text-lg text-gray-400">
+              Titre de l'article
+            </span>
 
             <input
               type="text"
               placeholder="Titre"
-              className="input input-bordered w-full mt-8"
+              className="input input-bordered w-full mb-4"
               onChange={(e) => {
                 setNewArticle({
                   ...newArticle,
@@ -80,10 +86,13 @@ export const Card = ({ article }) => {
               }}
               value={newArticle.title}
             />
+
+            <span className="text-lg text-gray-400">Tags</span>
+
             <input
               type="text"
               placeholder="Tags"
-              className="input input-bordered w-full mt-4"
+              className="input input-bordered w-full mb-4"
               onChange={(e) => {
                 setNewArticle({
                   ...newArticle,
@@ -92,9 +101,11 @@ export const Card = ({ article }) => {
               }}
               value={newArticle.tags.join(" ")}
             />
+
+            <span className="text-lg text-gray-400">Contenu</span>
             <textarea
               placeholder="Contenu"
-              className="input input-bordered w-full mt-4 "
+              className="textarea textarea-bordered min-h-[200px] w-full mb-4 "
               onChange={(e) => {
                 setNewArticle({
                   ...newArticle,
@@ -116,8 +127,49 @@ export const Card = ({ article }) => {
           </div>
         </div>
       </Modal>
+      <Modal
+        open={display}
+        onClose={() => setDisplay(false)}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+        draggable
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <div className="card w-1/2 h-3/4 bg-base-100 shadow-xl">
+        <figure>
+          <div className="bg-primary h-20 flex p-4 w-full">
+            <h1 className="card-title text-white text-2xl">{article.title}</h1>
 
-      <div className="card w-96 bg-base-100 shadow-xl mb-8" key={article.id}>
+          </div>
+        </figure>
+        
+          <div className="card-body">
+            <p>{article.content}</p>
+            <hr class="solid"></hr>
+            <div>
+              {article.tags.map((tag) => (
+                <span className="badge badge-secondary mr-1 ">{tag}</span>
+              ))}
+            </div>
+          </div>
+        </div>
+      </Modal>
+
+      <div
+        className="card w-96 bg-base-100 shadow-md mb-8 hover:shadow-secondary transition-all-500 hover:cursor-pointer hover:transform-scale-110 hover:shadow-xl"
+        key={article.id}
+        onClick={() => {
+          setDisplay(true);
+        }}
+      >
+        <figure>
+          <div className="bg-primary h-9 w-full"></div>
+        </figure>
+        
         <div className="card-body">
           <h2 className="card-title">{article.title}</h2>
           <p>{article.content}</p>
@@ -130,13 +182,17 @@ export const Card = ({ article }) => {
           <div className="card-actions justify-end">
             <button
               className="btn btn-secondary gap-2"
-              onClick={() => setOpen(true)}
+              onClick={(e) => {
+                e.stopPropagation();
+                setOpen(true);
+              }}
             >
               Modifier
             </button>
             <button
               className="btn btn-primary gap-2"
               onClick={(e) => {
+                e.stopPropagation();
                 handleDelete(e);
               }}
             >
