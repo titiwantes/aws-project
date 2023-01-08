@@ -1,6 +1,7 @@
 import React, { useContext, useState } from "react";
 import { HomeContext } from "../pages/Home";
 import Modal from "@mui/material/Modal";
+import { toast } from "react-hot-toast";
 
 const ActionBar = () => {
   const { articlesList, setArticlesList, ARTICLES } = useContext(HomeContext);
@@ -14,24 +15,36 @@ const ActionBar = () => {
   });
 
   const createArticle = () => {
-    setOpen(false);
-    const nextArticle = {
-      id: (Math.random() + 1).toString(36).substring(7),
-      title: newArticle.title,
-      content: newArticle.content,
-      tags: newArticle.tags,
-    };
-    console.log(nextArticle.tags);
 
-    setArticlesList([...articlesList, nextArticle]);
+    if (
+      newArticle.title !== "" &&
+      newArticle.content !== "" &&
+      newArticle.tags !== ""
+    ) {
+      setOpen(false);
+      const nextArticle = {
+        id: (Math.random() + 1).toString(36).substring(7),
+        title: newArticle.title,
+        content: newArticle.content,
+        tags: newArticle.tags,
+      };
+      console.log(nextArticle.tags);
+  
+      setArticlesList([...articlesList, nextArticle]);
+  
+      setNewArticle({
+        id: "",
+        title: "",
+        content: "",
+        tags: "",
+      });
+      // add the new article to database
 
-    setNewArticle({
-      id: "",
-      title: "",
-      content: "",
-      tags: "",
-    });
-    // add the new article to database
+      toast.success("Article créé avec succès");
+    } else {
+      toast.error("Veuillez remplir tous les champs");
+    }
+
   };
 
   return (
