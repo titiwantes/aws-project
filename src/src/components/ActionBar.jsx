@@ -1,37 +1,79 @@
 import React, { useContext, useState } from "react";
 import { HomeContext } from "../pages/Home";
 import Modal from "@mui/material/Modal";
+import { toast } from "react-hot-toast";
 
-const ActionBar = () => {
-  const { articlesList, setArticlesList, ARTICLES } = useContext(HomeContext);
-  console.log(ARTICLES);
+function generateRandomString(length) {
+  let result = "";
+  const characters =
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+  for (let i = 0; i < length; i++) {
+    result += characters.charAt(Math.floor(Math.random() * characters.length));
+  }
+  return result;
+}
+
+const ActionBar = ({ user }) => {
+  const { data, setData } = useContext(HomeContext);
   const [open, setOpen] = useState(false);
   const [newArticle, setNewArticle] = useState({
-    id: "",
+    id: generateRandomString(10),
     title: "",
     content: "",
     tags: "",
   });
 
+  const addArticle = () => {
+    fetch("https://466x4ag9y8.execute-api.us-east-1.amazonaws.com/items", {
+      method: "PUT",
+      body: JSON.stringify({
+        id: newArticle.id,
+        user: user.username,
+        title: newArticle.title,
+        content: newArticle.content,
+        tagList: newArticle.tags.join(" "),
+      }),
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + user.signInUserSession.accessToken.jwtToken,
+      },
+    })
+      .then((res) => {
+        toast.success("Article créé avec succès");
+      })
+      .catch((error) => {
+        toast.error("Une erreur est survenue");
+      });
+  };
+
   const createArticle = () => {
-    setOpen(false);
-    const nextArticle = {
-      id: (Math.random() + 1).toString(36).substring(7),
-      title: newArticle.title,
-      content: newArticle.content,
-      tags: newArticle.tags,
-    };
-    console.log(nextArticle.tags);
+    if (
+      newArticle.title !== "" &&
+      newArticle.content !== "" &&
+      newArticle.tags !== ""
+    ) {
+      setOpen(false);
+      const nextArticle = {
+        id: (Math.random() + 1).toString(36).substring(7),
+        title: newArticle.title,
+        content: newArticle.content,
+        tags: newArticle.tags.join(" "),
+        user: user.username,
+      };
 
-    setArticlesList([...articlesList, nextArticle]);
+      setData([...data, nextArticle]);
 
-    setNewArticle({
-      id: "",
-      title: "",
-      content: "",
-      tags: "",
-    });
-    // add the new article to database
+      setNewArticle({
+        id: "",
+        title: "",
+        content: "",
+        tags: "",
+      });
+      addArticle();
+      // add the new article to database
+    } else {
+      toast.error("Veuillez remplir tous les champs");
+    }
   };
 
   return (
@@ -78,7 +120,7 @@ const ActionBar = () => {
             />
             <textarea
               placeholder="Contenu"
-              className="input input-bordered w-full mt-4 "
+              className="input input-bordered min-h-[200px] w-full mt-4 "
               onChange={(e) => {
                 setNewArticle({
                   ...newArticle,
@@ -104,9 +146,7 @@ const ActionBar = () => {
       <div className="navbar-center">
         <button className="btn btn-secondary gap-2">
           Articles :
-          <div className="badge badge-primary">
-            {articlesList.length.toString()}
-          </div>
+          <div className="badge badge-primary">{data.length.toString()}</div>
         </button>
       </div>
 

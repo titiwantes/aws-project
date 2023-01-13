@@ -1,34 +1,41 @@
 import { useContext, useState } from "react";
 import { HomeContext } from "../pages/Home";
 
-const Navbar = () => {
-  const { setArticlesList, ARTICLES } = useContext(HomeContext);
+const Navbar = ({ signOut }) => {
+  const { setData, getData, saveData } =
+    useContext(HomeContext);
   const [select, setSelect] = useState("Chercher par titre");
 
   const handleSelect = (e) => {
-    setSelect(select === "Chercher par titre" ? "Chercher par tag" : "Chercher par titre");
+    setSelect(
+      select === "Chercher par titre"
+        ? "Chercher par tag"
+        : "Chercher par titre"
+    );
   };
 
-
   const handleSearch = (e) => {
+    if (e.target.value === "") {
+      getData();
+      return;
+    }
     const searchValue = e.target.value.split(" ");
     //filter articles by tag list of tags searched
-    
-    const filteredArticles = select.includes("tag") ? ARTICLES.filter((article) => {
-      return searchValue.every((tag) => {
-        return article.tags.some((articleTag) => {
-          return articleTag.includes(tag);
+
+    const filteredArticles = select.includes("tag")
+      ? saveData.filter((article) => {
+          return searchValue.every((tag) => {
+            return article.tags.split(" ").some((articleTag) => {
+              return articleTag.includes(tag);
+            });
+          });
+        })
+      : saveData.filter((article) => {
+          return searchValue.every((word) => {
+            return article.title.includes(word);
+          });
         });
-      });
-    }) : ARTICLES.filter((article) => {
-      return searchValue.every((word) => {
-        return article.title.includes(word);
-      });
-    });
-
-
-
-    setArticlesList(filteredArticles);
+    setData(filteredArticles);
   };
 
   return (
@@ -56,11 +63,13 @@ const Navbar = () => {
             className="menu menu-compact dropdown-content mt-3 p-2 shadow bg-base-100 rounded-box w-52"
           >
             <li>
-              <label>Homepage</label>
-            </li>
-            <li></li>
-            <li>
-              <label>Disconnect</label>
+              <label
+                onClick={() => {
+                  signOut();
+                }}
+              >
+                Disconnect
+              </label>
             </li>
           </ul>
         </div>
@@ -72,9 +81,10 @@ const Navbar = () => {
       </div>
 
       <div className="navbar-end">
-        <btn className="btn btn-primary mr-2 text-white " onClick={
-          handleSelect
-        } >
+        <btn
+          className="btn btn-primary mr-2 text-white "
+          onClick={handleSelect}
+        >
           {select}
         </btn>
         <div className="form-control">
